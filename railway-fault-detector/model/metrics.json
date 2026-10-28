@@ -1,0 +1,20 @@
+{
+  "test_images": 22,
+  "accuracy": 0.7727272727272727,
+  "defective_recall": 0.5454545454545454,
+  "defective_precision": 1.0,
+  "defective_f1": 0.7058823529411765,
+  "roc_auc": 0.9008264462809917,
+  "false_negative_rate": 0.45454545454545453,
+  "false_positive_rate": 0.0,
+  "confusion_matrix": [
+    [
+      11,
+      0
+    ],
+    [
+      5,
+      6
+    ]
+  ]
+}
