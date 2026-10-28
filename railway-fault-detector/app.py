@@ -33,7 +33,13 @@ st.markdown("""
 def load_assets():
     model = tf.keras.models.load_model(MODEL_DIR / "track_model.keras", compile=False)
     meta = json.load(open(MODEL_DIR / "class_names.json"))
-    feat_model = tf.keras.Model(model.input, model.get_layer("backbone").output)
+
+    # Rebuild a connected feature extractor: image -> rescale -> backbone
+    backbone = model.get_layer("backbone")
+    rescale = model.get_layer("rescale")
+    inp = tf.keras.Input(shape=(*IMG_SIZE, 3))
+    feat_model = tf.keras.Model(inp, backbone(rescale(inp), training=False))
+
     head = [model.get_layer(n) for n in ("gap", "drop", "pred")]
     return model, feat_model, head, meta
 
@@ -119,10 +125,13 @@ with tab1:
             st.markdown(verdict_html(p, thr), unsafe_allow_html=True)
             st.progress(min(max(p, 0.0), 1.0), text=f"Defect probability: {p*100:.1f}%  (threshold {thr*100:.0f}%)")
             if show_cam:
-                cam = gradcam(feat_model, head, meta, arr)
-                st.image(overlay(arr, cam), caption="Grad-CAM: regions influencing the decision",
-                         use_container_width=True)
-                st.caption("The heatmap shows what the model looked at. It is NOT an exact fault location.")
+                try:
+                    cam = gradcam(feat_model, head, meta, arr)
+                    st.image(overlay(arr, cam), caption="Grad-CAM: regions influencing the decision",
+                             use_container_width=True)
+                    st.caption("The heatmap shows what the model looked at. It is NOT an exact fault location.")
+                except Exception as e:
+                    st.warning(f"Grad-CAM could not be generated: {e}")
         st.session_state.log.append({
             "time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "file": getattr(file, "name", "camera"),
@@ -181,7 +190,7 @@ with tab4:
 ### About
 Image-level classifier that screens railway track photos as **defective / non-defective**.
 
-- **Data:** Kaggle *Railway Track Fault Detection (224×224)*, Train/Validation/Test splits
+- **Data:** Kaggle *Railway Track Fault Detection (224×224)*, train / valid / test splits
 - **Model:** MobileNetV2 (ImageNet) with two-phase transfer learning, class-weighted loss, augmentation
 - **Explainability:** Grad-CAM heatmaps
 
