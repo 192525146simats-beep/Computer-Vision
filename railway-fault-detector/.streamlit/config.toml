@@ -1,4 +1,4 @@
-# RailVision AI - Streamlit configuration
+# TrackSight - Streamlit configuration
 # Streamlit >= 1.46 supports separate [theme.light] / [theme.dark] sections.
 # Users can switch them from the app menu (⋮ > Settings), and the app also has
 # its own "Appearance" switch (Auto / Light / Dark) in the sidebar.
@@ -8,17 +8,17 @@ font = "serif"
 
 [theme.light]
 base = "light"
-primaryColor = "#2f5d46"
-backgroundColor = "#f7f5f0"
-secondaryBackgroundColor = "#efece4"
-textColor = "#1f2a24"
+primaryColor = "#2b5c8a"
+backgroundColor = "#f4f6f9"
+secondaryBackgroundColor = "#e6ebf2"
+textColor = "#1b2430"
 
 [theme.dark]
 base = "dark"
-primaryColor = "#5fb184"
-backgroundColor = "#121816"
-secondaryBackgroundColor = "#1b2420"
-textColor = "#e8efe9"
+primaryColor = "#6aa6dc"
+backgroundColor = "#0f141b"
+secondaryBackgroundColor = "#18202b"
+textColor = "#e6edf5"
 
 [server]
 maxUploadSize = 100
