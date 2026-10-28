@@ -4,21 +4,21 @@
 # its own "Appearance" switch (Auto / Light / Dark) in the sidebar.
 
 [theme]
-font = "serif"
+font = "sans serif"
 
 [theme.light]
 base = "light"
-primaryColor = "#2b5c8a"
-backgroundColor = "#f4f6f9"
-secondaryBackgroundColor = "#e6ebf2"
-textColor = "#1b2430"
+primaryColor = "#c77d00"
+backgroundColor = "#f6f1e4"
+secondaryBackgroundColor = "#ebe4d2"
+textColor = "#1c2230"
 
 [theme.dark]
 base = "dark"
-primaryColor = "#6aa6dc"
-backgroundColor = "#0f141b"
-secondaryBackgroundColor = "#18202b"
-textColor = "#e6edf5"
+primaryColor = "#ffb52e"
+backgroundColor = "#0f131b"
+secondaryBackgroundColor = "#171d29"
+textColor = "#ece8dc"
 
 [server]
 maxUploadSize = 100
