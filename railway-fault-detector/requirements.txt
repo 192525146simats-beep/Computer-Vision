@@ -1,5 +1,5 @@
-streamlit>=1.37
-tensorflow-cpu>=2.16,<2.19
+streamlit
+tensorflow-cpu
 numpy
 pandas
 pillow
