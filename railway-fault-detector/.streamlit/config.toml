@@ -1,7 +1,31 @@
+# RailVision AI - Streamlit configuration
+# Streamlit >= 1.46 supports separate [theme.light] / [theme.dark] sections.
+# Users can switch them from the app menu (⋮ > Settings), and the app also has
+# its own "Appearance" switch (Auto / Light / Dark) in the sidebar.
+
 [theme]
+font = "serif"
+
+[theme.light]
 base = "light"
 primaryColor = "#2f5d46"
 backgroundColor = "#f7f5f0"
 secondaryBackgroundColor = "#efece4"
 textColor = "#1f2a24"
-font = "serif"
+
+[theme.dark]
+base = "dark"
+primaryColor = "#5fb184"
+backgroundColor = "#121816"
+secondaryBackgroundColor = "#1b2420"
+textColor = "#e8efe9"
+
+[server]
+maxUploadSize = 100
+enableXsrfProtection = true
+
+[browser]
+gatherUsageStats = false
+
+[client]
+toolbarMode = "minimal"
