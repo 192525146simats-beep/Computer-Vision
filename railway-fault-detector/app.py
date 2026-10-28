@@ -1,4 +1,4 @@
-"""RailVision AI - Railway Track Inspector (Streamlit dashboard) v2.0
+"""TrackSight - Vision-Based Railway Infrastructure Inspection Framework (Streamlit dashboard) v2.0
 
 Features: upload / sample / live camera inspection, batch inspection, Grad-CAM,
 sensitivity presets, confidence breakdown (multi-view stability + severity grade),
@@ -41,22 +41,23 @@ SAMPLE_DIR = BASE / "samples"
 IMG_SIZE = (224, 224)
 XL_MIME = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 VERSION = "v2.0"
+PROJECT_TITLE = "Vision-Based Railway Infrastructure Inspection Framework for Automated Track Fault Classification"
 DISCLAIMER = ("Screening aid only. Not a railway safety certification. "
               "Confirm with a qualified track inspector.")
 
-st.set_page_config(page_title="RailVision AI - Track Inspector", page_icon="🚆", layout="wide")
+st.set_page_config(page_title="TrackSight - Railway Track Fault Classification", page_icon="🚆", layout="wide")
 
 # =====================================================================
 # Styling & theme
 # =====================================================================
 BASE_CSS = """
 <style>
-.block-container {padding-top: 1.3rem; max-width: 1300px;}
+.block-container {padding-top: 3.4rem; max-width: 1300px;}
 .pagetitle {margin: 0; padding-top: .15rem; font-size: 1.7rem;}
 .brand {font-size: 1.35rem; margin-bottom: .8rem;}
 .chip {display:inline-block; padding:.2rem .7rem; border-radius:999px; font-size:.8rem;
        border:1px solid rgba(128,128,128,.35); background: rgba(128,128,128,.1);}
-.chip.ok {border-color: rgba(47,125,80,.5); background: rgba(47,125,80,.14);}
+.chip.ok {border-color: rgba(43,111,168,.55); background: rgba(43,111,168,.16);}
 .kpi {border:1px solid rgba(128,128,128,.28); border-radius:14px; padding:1rem 1.2rem;
       background: rgba(128,128,128,.07);}
 .kpi .l {font-family: ui-monospace, Menlo, monospace; font-size:.72rem; letter-spacing:.12em;
@@ -69,11 +70,11 @@ BASE_CSS = """
 .bar-fg {height:8px; border-radius:99px;}
 .badge {display:inline-block; padding:.2rem .7rem; border-radius:999px; font-weight:700; font-size:.85rem;}
 .badge.bad {background:var(--bad-bg,#ffe3e3); color:var(--bad-fg,#b00020);}
-.badge.good {background:var(--good-bg,#e0f7e9); color:var(--good-fg,#0b7a3b);}
+.badge.good {background:var(--good-bg,#e1edf8); color:var(--good-fg,#0b4f8a);}
 .verdict {padding:1.1rem 1.2rem; border-radius:12px; font-size:1.4rem; font-weight:700;
           text-align:center; margin-bottom:.6rem;}
 .verdict.bad {background:var(--bad-bg,#ffe3e3); color:var(--bad-fg,#b00020); border:2px solid var(--bad-fg,#b00020);}
-.verdict.good {background:var(--good-bg,#e0f7e9); color:var(--good-fg,#0b7a3b); border:2px solid var(--good-fg,#0b7a3b);}
+.verdict.good {background:var(--good-bg,#e1edf8); color:var(--good-fg,#0b4f8a); border:2px solid var(--good-fg,#0b4f8a);}
 .footer {text-align:center; opacity:.55; font-size:.85rem; margin-top:2rem;}
 section[data-testid="stSidebar"] .stButton > button {
     width:100%; justify-content:flex-start; text-align:left; border-radius:10px;}
@@ -81,12 +82,14 @@ section[data-testid="stSidebar"] .stButton > button {
 """
 
 THEMES = {
-    "Light": {"bg": "#f7f5f0", "side": "#efece4", "text": "#1f2a24", "input": "#ffffff",
-              "line": "rgba(31,42,36,.18)", "bad-bg": "#ffe3e3", "bad-fg": "#b00020",
-              "good-bg": "#e0f7e9", "good-fg": "#0b7a3b"},
-    "Dark": {"bg": "#121816", "side": "#0e1412", "text": "#e8efe9", "input": "#1b2420",
-             "line": "rgba(232,239,233,.18)", "bad-bg": "rgba(230,90,70,.18)", "bad-fg": "#ff9d8f",
-             "good-bg": "rgba(70,190,120,.16)", "good-fg": "#7fe0a5"},
+    "Light": {"bg": "#f4f6f9", "side": "#e6ebf2", "text": "#1b2430", "input": "#ffffff",
+              "line": "rgba(27,36,48,.18)", "primary": "#2b5c8a", "on-primary": "#ffffff",
+              "bad-bg": "#ffe3e3", "bad-fg": "#b00020",
+              "good-bg": "#e1edf8", "good-fg": "#0b4f8a"},
+    "Dark": {"bg": "#0f141b", "side": "#0b1016", "text": "#e6edf5", "input": "#18202b",
+             "line": "rgba(230,237,245,.18)", "primary": "#6aa6dc", "on-primary": "#0b1016",
+             "bad-bg": "rgba(230,90,70,.18)", "bad-fg": "#ff9d8f",
+             "good-bg": "rgba(90,160,225,.16)", "good-fg": "#8fc1f0"},
 }
 
 OVERRIDE_CSS = """
@@ -104,7 +107,8 @@ OVERRIDE_CSS = """
 [data-testid="stBaseButton-secondary"], button[kind="secondary"] {
     background: var(--input); color: var(--text); border-color: var(--line);}
 [data-testid="stBaseButton-secondary"] p, button[kind="secondary"] p {color: var(--text);}
-[data-testid="stBaseButton-primary"] p, button[kind="primary"] p {color: #ffffff;}
+[data-testid="stBaseButton-primary"], button[kind="primary"] {background: var(--primary); border-color: var(--primary);}
+[data-testid="stBaseButton-primary"] p, button[kind="primary"] p {color: var(--on-primary);}
 """
 DARK_EXTRA = ('[data-testid="stDataFrame"] {filter: invert(.9) hue-rotate(180deg);} '
               '[data-testid="stImage"] img {border-radius: 8px;}')
@@ -133,7 +137,7 @@ st.markdown(BASE_CSS, unsafe_allow_html=True)
 st.markdown(theme_css(ss.theme_mode), unsafe_allow_html=True)
 
 PRESETS = {"Balanced (0.50)": 0.50, "Safety-first (0.30)": 0.30, "Strict (0.70)": 0.70}
-COL_OK, COL_BAD, COL_WARN = "#2f7d50", "#a63d2f", "#c9822b"
+COL_OK, COL_BAD, COL_WARN = "#2b6fa8", "#a63d2f", "#c9822b"
 VIEW_LABELS = ["Original", "Horizontal flip", "Vertical flip", "Darker (-10%)", "Brighter (+10%)"]
 
 
@@ -304,7 +308,7 @@ def badge(p, thr):
 def verdict_html(p, thr):
     if p >= thr:
         return f'<div class="verdict bad">⚠️ POSSIBLE FAULT &nbsp;|&nbsp; {p*100:.1f}% defect probability</div>'
-    return f'<div class="verdict good">✅ NO FAULT DETECTED &nbsp;|&nbsp; {p*100:.1f}% defect probability</div>'
+    return f'<div class="verdict good">🛡️ NO FAULT DETECTED &nbsp;|&nbsp; {p*100:.1f}% defect probability</div>'
 
 
 def safe_open(src, label="image"):
@@ -508,7 +512,7 @@ def single_report(info):
                [[lbl, f"{p*100:.1f}%", "Defective" if p >= info["thr"] else "Non-defective"]
                 for lbl, p in zip(VIEW_LABELS, v)], [7, 5, 5], True),
               ("sp",), ("p", DISCLAIMER)]
-    return txt, build_pdf("RailVision AI - Track Inspection Report", blocks)
+    return txt, build_pdf("TrackSight - Track Inspection Report", blocks)
 
 
 def batch_pdf(res, imgs, probs):
@@ -527,7 +531,7 @@ def batch_pdf(res, imgs, probs):
               ("imgs", [(imgs[i], f"{res['File'].iloc[i]} - {probs[i]*100:.0f}%") for i in order[:2]]),
               ("imgs", [(imgs[i], f"{res['File'].iloc[i]} - {probs[i]*100:.0f}%") for i in order[2:4]])
               if len(order) > 2 else ("sp",), ("sp",), ("p", DISCLAIMER)]
-    return build_pdf("RailVision AI - Batch Inspection Summary", blocks)
+    return build_pdf("TrackSight - Batch Inspection Summary", blocks)
 
 
 # =====================================================================
@@ -574,7 +578,7 @@ def sens_control(slot):
 
 
 with st.sidebar:
-    st.markdown('<div class="brand">🚆 <b>RailVision</b> <span class="chip">AI</span></div>',
+    st.markdown('<div class="brand">🚆 <b>TrackSight</b><br><span style="font-size:.72rem;opacity:.7">Railway Track Fault Classification</span></div>',
                 unsafe_allow_html=True)
     for key, label in NAV:
         st.button(label, key=f"nav_{key}", type="primary" if ss.page == key else "secondary",
@@ -583,7 +587,7 @@ with st.sidebar:
     st.radio("🎨 Appearance", ["Auto", "Light", "Dark"], key="theme_mode", horizontal=True,
              help="Auto follows the Streamlit theme (⋮ menu > Settings).")
     demo_on = any(r.get("demo") for r in ss.history)
-    st.caption(("🟠 Demo data loaded" if demo_on else "🟢 Live session") + f" · {VERSION}")
+    st.caption(("🟠 Demo data loaded" if demo_on else "🔵 Live session") + f" · {VERSION}")
     st.caption("MobileNetV2 · 224×224 input")
     st.caption("⚠️ " + DISCLAIMER)
 
@@ -689,8 +693,8 @@ def page_overview():
 
     with st.container(border=True):
         h1, h2, h3 = st.columns([4, 1.4, 1.4])
-        h1.markdown("### Track Intelligence Dashboard")
-        h1.caption("AI-assisted screening of railway track images with explainable heatmaps.")
+        h1.markdown("### Vision-Based Railway Infrastructure Inspection Framework")
+        h1.caption("Automated track fault classification from images, with explainable heatmaps.")
         h2.button("🔍 Inspect Track", type="primary", on_click=goto, args=("Inspect",), key="ov_ins")
         h3.button("📷 Live Scanner", on_click=goto, args=("Live",), key="ov_live")
 
@@ -716,7 +720,7 @@ def page_overview():
                     if k not in vol:
                         vol[k] = 0
                 vol = vol[["Uploads", "Scans"]]
-                (st.area_chart if len(vol) >= 2 else st.bar_chart)(vol, color=["#2f5d46", "#b8a58a"])
+                (st.area_chart if len(vol) >= 2 else st.bar_chart)(vol, color=["#2b5c8a", "#9bb3cc"])
             else:
                 st.caption("No inspections yet. Inspect an image, or load demo data in Settings.")
     with right:
@@ -953,18 +957,18 @@ def page_analytics():
         with st.container(border=True):
             st.markdown("#### Inspections by hour")
             hourly = df.groupby("Hour").size().reindex(range(24), fill_value=0)
-            st.bar_chart(hourly.rename("Inspections"), color="#2f5d46")
+            st.bar_chart(hourly.rename("Inspections"), color="#2b5c8a")
     with c2:
         with st.container(border=True):
             st.markdown("#### Capture source distribution")
-            bars([(s, int(r.n), col) for (s, r), col in zip(by_src.iterrows(), [COL_OK, COL_WARN, "#6b8fa3"])])
+            bars([(s, int(r.n), col) for (s, r), col in zip(by_src.iterrows(), [COL_OK, COL_WARN, "#7a8fa6"])])
             st.caption("Defect rate by source (%)")
             st.bar_chart(by_src["rate"].rename("Defect rate (%)"), color="#c9822b")
         with st.container(border=True):
             st.markdown("#### Probability distribution")
             hist_vals, _ = np.histogram(df["Defect probability (%)"], bins=10, range=(0, 100))
             st.bar_chart(pd.Series(hist_vals, index=[f"{i*10}-{i*10+10}" for i in range(10)], name="Images"),
-                         color="#2f5d46")
+                         color="#2b5c8a")
 
     with st.container(border=True):
         st.markdown("#### Daily trend")
@@ -972,7 +976,7 @@ def page_analytics():
         daily["Defect rate (%)"] = (daily["Defective"] / daily["Inspections"] * 100).round(1)
         t1, t2 = st.columns(2)
         t1.caption("Inspections vs. flagged per day")
-        t1.bar_chart(daily[["Inspections", "Defective"]], color=["#2f5d46", "#a63d2f"])
+        t1.bar_chart(daily[["Inspections", "Defective"]], color=["#2b5c8a", "#a63d2f"])
         t2.caption("Defect rate per day (%)")
         t2.line_chart(daily["Defect rate (%)"], color="#a63d2f")
 
@@ -1074,7 +1078,7 @@ def page_guide():
                     "- A missed fault (false negative) is possible.\n"
                     "- **This is a research prototype and not a railway safety certification.**")
     with st.expander("About the model and data"):
-        st.markdown("- **Data:** Kaggle *Railway Track Fault Detection (224×224)*, train / valid / test splits\n"
+        st.markdown(f"- **Project:** {PROJECT_TITLE}\n- **Data:** Kaggle *Railway Track Fault Detection (224×224)*, train / valid / test splits\n"
                     "- **Model:** MobileNetV2 (ImageNet), two-phase transfer learning, class-weighted loss, "
                     "augmentation\n- **Explainability:** Grad-CAM")
 
@@ -1124,7 +1128,7 @@ def page_settings():
 
     with st.container(border=True):
         st.markdown("#### About")
-        st.markdown(f"**RailVision AI** {VERSION} · research prototype · not a railway safety certification.")
+        st.markdown(f"**TrackSight** {VERSION}  \n*{PROJECT_TITLE}*  \nResearch prototype · not a railway safety certification.")
 
 
 PAGES = {"Overview": page_overview, "Inspect": page_inspect, "Live": page_live, "Batch": page_batch,
@@ -1137,5 +1141,5 @@ except Exception as exc:  # last-resort guard so one page error never blanks the
     st.error(f"Something went wrong on this page: {exc}")
     st.button("Back to Overview", on_click=goto, args=("Overview",), key="err_back")
 
-st.markdown(f'<div class="footer">RailVision AI · research prototype · not a safety certification</div>',
+st.markdown(f'<div class="footer">{PROJECT_TITLE}<br>research prototype · not a safety certification</div>',
             unsafe_allow_html=True)
