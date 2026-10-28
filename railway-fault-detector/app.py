@@ -52,53 +52,115 @@ st.set_page_config(page_title="TrackSight - Railway Track Fault Classification",
 # =====================================================================
 BASE_CSS = """
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600;700&display=swap');
+:root {--lamp:#ffb52e; --accent:#b86e00;
+       --font-ui:'Space Grotesk',system-ui,-apple-system,'Segoe UI',sans-serif;
+       --font-mono:'JetBrains Mono',ui-monospace,Menlo,monospace;}
+.stApp {font-family: var(--font-ui) !important;}
+.stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp h5, .stApp p, .stApp label, .stApp button,
+.stApp input, .stApp textarea {font-family: var(--font-ui) !important;}
 .block-container {padding-top: 3.4rem; max-width: 1300px;}
-.pagetitle {margin: 0; padding-top: .15rem; font-size: 1.7rem;}
-.brand {font-size: 1.35rem; margin-bottom: .8rem;}
-.chip {display:inline-block; padding:.2rem .7rem; border-radius:999px; font-size:.8rem;
+
+/* ---- page header ---- */
+.eyebrow {font-family: var(--font-mono); font-size:.66rem; letter-spacing:.22em; color: var(--accent); font-weight:600;}
+.pagetitle {margin: .1rem 0 0; font-size: 1.9rem; font-weight:700; letter-spacing:-.02em;}
+.brand {font-size: 1.4rem; margin-bottom: 1rem; line-height:1.1;}
+.brand .tag {font-family: var(--font-mono); font-size:.58rem; letter-spacing:.18em; opacity:.65; margin-top:.35rem;}
+.chip {display:inline-block; padding:.2rem .7rem; border-radius:6px; font-size:.78rem; font-family: var(--font-mono);
        border:1px solid rgba(128,128,128,.35); background: rgba(128,128,128,.1);}
-.chip.ok {border-color: rgba(43,111,168,.55); background: rgba(43,111,168,.16);}
-.kpi {border:1px solid rgba(128,128,128,.28); border-radius:14px; padding:1rem 1.2rem;
-      background: rgba(128,128,128,.07);}
-.kpi .l {font-family: ui-monospace, Menlo, monospace; font-size:.72rem; letter-spacing:.12em;
-         text-transform: uppercase; opacity:.7;}
-.kpi .v {font-size:2rem; font-weight:700; margin:.1rem 0;}
-.kpi .s {font-family: ui-monospace, Menlo, monospace; font-size:.78rem; opacity:.75;}
+.chip.ok {border-color: rgba(25,167,184,.6); background: rgba(25,167,184,.16);}
+
+/* ---- departure-board KPI tiles ---- */
+.kpi {position:relative; border-radius:14px; padding:1rem 1.2rem; background:#1b2130 !important;
+      border:1px solid #2b3347; border-top:3px solid var(--lamp); box-shadow:0 6px 18px rgba(8,12,22,.18);}
+.kpi::before {content:""; position:absolute; top:.95rem; right:1.1rem; width:8px; height:8px; border-radius:50%;
+              background:var(--lamp); box-shadow:0 0 10px var(--lamp);}
+.kpi .l {font-family: var(--font-mono); font-size:.68rem; letter-spacing:.18em; text-transform: uppercase; color:#9aa4ba !important;}
+.kpi .v {font-family: var(--font-mono); font-size:2rem; font-weight:700; margin:.15rem 0; color:var(--lamp) !important;}
+.kpi .s {font-family: var(--font-mono); font-size:.72rem; color:#c9cfdd !important; opacity:.85;}
+
+/* ---- bars / badges ---- */
 .bar-row {margin-bottom:.9rem;}
 .bar-top {display:flex; justify-content:space-between; font-size:.92rem;}
 .bar-bg {height:8px; border-radius:99px; background: rgba(128,128,128,.22); margin-top:.3rem;}
 .bar-fg {height:8px; border-radius:99px;}
-.badge {display:inline-block; padding:.2rem .7rem; border-radius:999px; font-weight:700; font-size:.85rem;}
+.badge {display:inline-block; padding:.2rem .7rem; border-radius:6px; font-family: var(--font-mono); font-weight:700; font-size:.82rem;}
 .badge.bad {background:var(--bad-bg,#ffe3e3); color:var(--bad-fg,#b00020);}
-.badge.good {background:var(--good-bg,#e1edf8); color:var(--good-fg,#0b4f8a);}
-.verdict {padding:1.1rem 1.2rem; border-radius:12px; font-size:1.4rem; font-weight:700;
-          text-align:center; margin-bottom:.6rem;}
+.badge.good {background:var(--good-bg,#dff3f6); color:var(--good-fg,#0a6573);}
+
+/* ---- signal-lamp verdict ---- */
+.verdict {padding:1.1rem 1.2rem; border-radius:12px; font-size:1.35rem; font-weight:700; text-align:center; margin-bottom:.6rem;}
 .verdict.bad {background:var(--bad-bg,#ffe3e3); color:var(--bad-fg,#b00020); border:2px solid var(--bad-fg,#b00020);}
-.verdict.good {background:var(--good-bg,#e1edf8); color:var(--good-fg,#0b4f8a); border:2px solid var(--good-fg,#0b4f8a);}
-.footer {text-align:center; opacity:.55; font-size:.85rem; margin-top:2rem;}
+.verdict.good {background:var(--good-bg,#dff3f6); color:var(--good-fg,#0a6573); border:2px solid var(--good-fg,#0a6573);}
+.lamp {display:inline-block; width:14px; height:14px; border-radius:50%; background:currentColor; margin-right:.7rem;
+       box-shadow:0 0 12px currentColor; animation: rv-pulse 1.6s ease-in-out infinite; vertical-align:middle;}
+@keyframes rv-pulse {50% {opacity:.35; box-shadow:0 0 3px currentColor;}}
+
+/* ---- hero band with an animated train on the rails ---- */
+.hero {position:relative; overflow:hidden; border-radius:18px; padding:1.5rem 1.8rem 3.6rem; margin-bottom:.8rem;
+       background:linear-gradient(135deg,#141a27,#222c43); border:1px solid #2b3347;}
+.stApp .hero .eyebrow-l {font-family: var(--font-mono); font-size:.66rem; letter-spacing:.22em; color:var(--lamp) !important;}
+.stApp .hero h3 {margin:.4rem 0 .5rem; font-size:1.65rem; line-height:1.2; color:#f4efe0 !important; padding:0;}
+.stApp .hero p {color:#aab3c7 !important; margin:0 0 .3rem; max-width:62ch;}
+.hero .tag {display:inline-block; margin:.6rem .45rem 0 0; padding:.15rem .6rem; border:1px solid rgba(255,181,46,.5);
+            border-radius:6px; font:600 .68rem var(--font-mono); letter-spacing:.08em; color:#ffd07a;}
+.hero .track {position:absolute; left:0; right:0; bottom:0; height:30px;
+  background:
+   linear-gradient(to bottom, transparent 7px, #8f98ad 7px 9px, transparent 9px 19px, #8f98ad 19px 21px, transparent 21px),
+   repeating-linear-gradient(90deg, transparent 0 24px, rgba(255,181,46,.38) 24px 30px);}
+.hero .train {position:absolute; bottom:9px; left:-70px; width:56px; height:13px; border-radius:7px 10px 10px 7px;
+              background:var(--lamp); box-shadow:0 0 16px rgba(255,181,46,.75); animation: rv-run 10s linear infinite;}
+.hero .train::after {content:""; position:absolute; right:5px; top:4px; width:12px; height:5px; border-radius:3px; background:#141a27;}
+@keyframes rv-run {to {left:calc(100% + 20px);}}
+@media (prefers-reduced-motion: reduce) {.hero .train, .lamp {animation:none;}}
+
+/* ---- section headings get a signal-post marker ---- */
+.stApp h4 {border-left:4px solid var(--lamp); padding-left:.65rem !important; letter-spacing:-.01em;}
+
+/* ---- sidebar: nav as a railway line with stations ---- */
+section[data-testid="stSidebar"] [data-testid="stVerticalBlock"] {gap:.1rem;}
+section[data-testid="stSidebar"] .stElementContainer:has(.stButton), section[data-testid="stSidebar"] .stButton {width:100%;}
 section[data-testid="stSidebar"] .stButton > button {
-    width:100%; justify-content:flex-start; text-align:left; border-radius:10px;}
+    position:relative; width:100%; justify-content:flex-start; text-align:left; border-radius:0 12px 12px 0;
+    background:transparent !important; border:none !important; box-shadow:none; padding:.55rem .6rem .55rem 2.7rem;}
+section[data-testid="stSidebar"] .stButton > button::before {
+    content:""; position:absolute; left:.95rem; top:50%; width:11px; height:11px; margin-top:-6px; border-radius:50%;
+    border:2px solid var(--lamp); background:var(--side,#161b27); z-index:2; transition:all .15s;}
+section[data-testid="stSidebar"] .stButton > button::after {
+    content:""; position:absolute; left:calc(.95rem + 5.5px); top:-.5rem; bottom:-.5rem; width:2px;
+    background:rgba(255,181,46,.35); z-index:1;}
+section[data-testid="stSidebar"] .stButton > button:hover {background:rgba(255,181,46,.08) !important;}
+section[data-testid="stSidebar"] .stButton > button:hover::before {background:rgba(255,181,46,.45);}
+section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] {background:rgba(255,181,46,.12) !important;}
+section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] p {color:var(--lamp) !important; font-weight:700;}
+section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"]::before {
+    background:var(--lamp); box-shadow:0 0 10px var(--lamp);}
+
+.footer {text-align:center; opacity:.6; font-size:.8rem; font-family: var(--font-mono); margin-top:2rem;}
 </style>
 """
 
 THEMES = {
-    "Light": {"bg": "#f4f6f9", "side": "#e6ebf2", "text": "#1b2430", "input": "#ffffff",
-              "line": "rgba(27,36,48,.18)", "primary": "#2b5c8a", "on-primary": "#ffffff",
-              "bad-bg": "#ffe3e3", "bad-fg": "#b00020",
-              "good-bg": "#e1edf8", "good-fg": "#0b4f8a"},
-    "Dark": {"bg": "#0f141b", "side": "#0b1016", "text": "#e6edf5", "input": "#18202b",
-             "line": "rgba(230,237,245,.18)", "primary": "#6aa6dc", "on-primary": "#0b1016",
+    "Light": {"bg": "#f6f1e4", "side": "#1a2030", "side-text": "#ece8dc", "text": "#1c2230", "input": "#fffdf7",
+              "line": "rgba(28,34,48,.2)", "primary": "#1a2030", "on-primary": "#ffb52e", "accent": "#b86e00",
+              "bad-bg": "#fde4df", "bad-fg": "#b3321f", "good-bg": "#dff3f6", "good-fg": "#0a6573"},
+    "Dark": {"bg": "#0f131b", "side": "#0a0d13", "side-text": "#ece8dc", "text": "#ece8dc", "input": "#171d29",
+             "line": "rgba(236,232,220,.18)", "primary": "#ffb52e", "on-primary": "#10141c", "accent": "#ffb52e",
              "bad-bg": "rgba(230,90,70,.18)", "bad-fg": "#ff9d8f",
-             "good-bg": "rgba(90,160,225,.16)", "good-fg": "#8fc1f0"},
+             "good-bg": "rgba(25,167,184,.18)", "good-fg": "#6fdbe8"},
 }
 
 OVERRIDE_CSS = """
 .stApp {background: var(--bg); color: var(--text);}
-[data-testid="stHeader"] {background: var(--bg);}
+[data-testid="stHeader"] {background: transparent;}
 [data-testid="stSidebar"] {background: var(--side);}
 .stApp p, .stApp span, .stApp label, .stApp li, .stApp h1, .stApp h2, .stApp h3, .stApp h4,
 .stApp h5, .stApp h6, .stApp small, [data-testid="stMetricValue"], [data-testid="stMetricLabel"],
 [data-testid="stCaptionContainer"] {color: var(--text);}
+section[data-testid="stSidebar"] p, section[data-testid="stSidebar"] span, section[data-testid="stSidebar"] label,
+section[data-testid="stSidebar"] small, section[data-testid="stSidebar"] h1, section[data-testid="stSidebar"] h2,
+section[data-testid="stSidebar"] [data-testid="stCaptionContainer"], section[data-testid="stSidebar"] button p {
+    color: var(--side-text);}
 .stApp input, .stApp textarea {background: var(--input) !important; color: var(--text) !important;}
 [data-baseweb="select"] > div, [data-baseweb="input"] > div {background: var(--input) !important;}
 [data-baseweb="popover"] ul, [data-baseweb="popover"] li {background: var(--input); color: var(--text);}
@@ -109,6 +171,7 @@ OVERRIDE_CSS = """
 [data-testid="stBaseButton-secondary"] p, button[kind="secondary"] p {color: var(--text);}
 [data-testid="stBaseButton-primary"], button[kind="primary"] {background: var(--primary); border-color: var(--primary);}
 [data-testid="stBaseButton-primary"] p, button[kind="primary"] p {color: var(--on-primary);}
+section[data-testid="stSidebar"] [data-testid="stBaseButton-primary"] p {color: var(--lamp);}
 """
 DARK_EXTRA = ('[data-testid="stDataFrame"] {filter: invert(.9) hue-rotate(180deg);} '
               '[data-testid="stImage"] img {border-radius: 8px;}')
@@ -137,7 +200,7 @@ st.markdown(BASE_CSS, unsafe_allow_html=True)
 st.markdown(theme_css(ss.theme_mode), unsafe_allow_html=True)
 
 PRESETS = {"Balanced (0.50)": 0.50, "Safety-first (0.30)": 0.30, "Strict (0.70)": 0.70}
-COL_OK, COL_BAD, COL_WARN = "#2b6fa8", "#a63d2f", "#c9822b"
+COL_OK, COL_BAD, COL_WARN = "#19a7b8", "#d9503f", "#ffb52e"
 VIEW_LABELS = ["Original", "Horizontal flip", "Vertical flip", "Darker (-10%)", "Brighter (+10%)"]
 
 
@@ -307,8 +370,8 @@ def badge(p, thr):
 
 def verdict_html(p, thr):
     if p >= thr:
-        return f'<div class="verdict bad">⚠️ POSSIBLE FAULT &nbsp;|&nbsp; {p*100:.1f}% defect probability</div>'
-    return f'<div class="verdict good">🛡️ NO FAULT DETECTED &nbsp;|&nbsp; {p*100:.1f}% defect probability</div>'
+        return f'<div class="verdict bad"><span class="lamp"></span>POSSIBLE FAULT &nbsp;|&nbsp; {p*100:.1f}% defect probability</div>'
+    return f'<div class="verdict good"><span class="lamp"></span>NO FAULT DETECTED &nbsp;|&nbsp; {p*100:.1f}% defect probability</div>'
 
 
 def safe_open(src, label="image"):
@@ -554,7 +617,8 @@ def on_search():
 
 def topbar(title):
     c1, c2, c3, c4 = st.columns([2.6, 3.2, 1.5, 1.5])
-    c1.markdown(f'<h2 class="pagetitle">{title}</h2>', unsafe_allow_html=True)
+    c1.markdown(f'<div class="eyebrow">TRACKSIGHT / {title.upper()}</div><h2 class="pagetitle">{title}</h2>',
+                unsafe_allow_html=True)
     c2.text_input("Search", key="gsearch", placeholder="🔎 Search inspections by file name or ID...",
                   label_visibility="collapsed", on_change=on_search)
     try:
@@ -578,7 +642,7 @@ def sens_control(slot):
 
 
 with st.sidebar:
-    st.markdown('<div class="brand">🚆 <b>TrackSight</b><br><span style="font-size:.72rem;opacity:.7">Railway Track Fault Classification</span></div>',
+    st.markdown('<div class="brand">🚆 <b>TrackSight</b><div class="tag">RAILWAY TRACK FAULT CLASSIFICATION</div></div>',
                 unsafe_allow_html=True)
     for key, label in NAV:
         st.button(label, key=f"nav_{key}", type="primary" if ss.page == key else "secondary",
@@ -691,12 +755,16 @@ def page_overview():
     topbar("Overview")
     hist = ss.history
 
-    with st.container(border=True):
-        h1, h2, h3 = st.columns([4, 1.4, 1.4])
-        h1.markdown("### Vision-Based Railway Infrastructure Inspection Framework")
-        h1.caption("Automated track fault classification from images, with explainable heatmaps.")
-        h2.button("🔍 Inspect Track", type="primary", on_click=goto, args=("Inspect",), key="ov_ins")
-        h3.button("📷 Live Scanner", on_click=goto, args=("Live",), key="ov_live")
+    st.markdown(
+        '<div class="hero"><div class="eyebrow-l">RESEARCH PROTOTYPE · MOBILENETV2 · GRAD-CAM</div>'
+        f'<h3>{PROJECT_TITLE}</h3>'
+        '<p>Screen railway track images for faults, see what the model looked at, and export inspection reports.</p>'
+        '<span class="tag">LIVE CAMERA</span><span class="tag">BATCH SCAN</span><span class="tag">EXCEL · CSV · PDF</span>'
+        '<div class="track"></div><div class="train"></div></div>', unsafe_allow_html=True)
+    b1, b2, _ = st.columns([1.5, 1.5, 5])
+    b1.button("🔍 Inspect Track", type="primary", on_click=goto, args=("Inspect",), key="ov_ins")
+    b2.button("📷 Live Scanner", on_click=goto, args=("Live",), key="ov_live")
+    st.write("")
 
     n = len(hist)
     scans = sum(1 for r in hist if r["source"] == "Scan")
@@ -720,7 +788,7 @@ def page_overview():
                     if k not in vol:
                         vol[k] = 0
                 vol = vol[["Uploads", "Scans"]]
-                (st.area_chart if len(vol) >= 2 else st.bar_chart)(vol, color=["#2b5c8a", "#9bb3cc"])
+                (st.area_chart if len(vol) >= 2 else st.bar_chart)(vol, color=["#19a7b8", "#ffb52e"])
             else:
                 st.caption("No inspections yet. Inspect an image, or load demo data in Settings.")
     with right:
@@ -952,23 +1020,23 @@ def page_analytics():
     with c1:
         with st.container(border=True):
             st.markdown("#### Defect rate by time of day")
-            st.bar_chart(by_period["rate"].rename("Defect rate (%)"), color="#a63d2f")
+            st.bar_chart(by_period["rate"].rename("Defect rate (%)"), color="#d9503f")
             st.caption("Share of inspections flagged defective in each period of the day.")
         with st.container(border=True):
             st.markdown("#### Inspections by hour")
             hourly = df.groupby("Hour").size().reindex(range(24), fill_value=0)
-            st.bar_chart(hourly.rename("Inspections"), color="#2b5c8a")
+            st.bar_chart(hourly.rename("Inspections"), color="#19a7b8")
     with c2:
         with st.container(border=True):
             st.markdown("#### Capture source distribution")
             bars([(s, int(r.n), col) for (s, r), col in zip(by_src.iterrows(), [COL_OK, COL_WARN, "#7a8fa6"])])
             st.caption("Defect rate by source (%)")
-            st.bar_chart(by_src["rate"].rename("Defect rate (%)"), color="#c9822b")
+            st.bar_chart(by_src["rate"].rename("Defect rate (%)"), color="#ffb52e")
         with st.container(border=True):
             st.markdown("#### Probability distribution")
             hist_vals, _ = np.histogram(df["Defect probability (%)"], bins=10, range=(0, 100))
             st.bar_chart(pd.Series(hist_vals, index=[f"{i*10}-{i*10+10}" for i in range(10)], name="Images"),
-                         color="#2b5c8a")
+                         color="#19a7b8")
 
     with st.container(border=True):
         st.markdown("#### Daily trend")
@@ -976,9 +1044,9 @@ def page_analytics():
         daily["Defect rate (%)"] = (daily["Defective"] / daily["Inspections"] * 100).round(1)
         t1, t2 = st.columns(2)
         t1.caption("Inspections vs. flagged per day")
-        t1.bar_chart(daily[["Inspections", "Defective"]], color=["#2b5c8a", "#a63d2f"])
+        t1.bar_chart(daily[["Inspections", "Defective"]], color=["#19a7b8", "#d9503f"])
         t2.caption("Defect rate per day (%)")
-        t2.line_chart(daily["Defect rate (%)"], color="#a63d2f")
+        t2.line_chart(daily["Defect rate (%)"], color="#d9503f")
 
     with st.container(border=True):
         st.markdown("#### Severity & weekday breakdown")
@@ -986,7 +1054,7 @@ def page_analytics():
         sev = df["Severity"].value_counts().reindex(
             ["S0 Clear", "S1 Watch", "S2 Minor", "S3 Major", "S4 Critical"], fill_value=0)
         s1.caption("Severity grades (heuristic)")
-        s1.bar_chart(sev.rename("Records"), color="#c9822b")
+        s1.bar_chart(sev.rename("Records"), color="#ffb52e")
         order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
         pv = (df.pivot_table(index="Weekday", columns="Period", values="Flag", aggfunc="mean", observed=False)
               .reindex(order).mul(100).round(0))
