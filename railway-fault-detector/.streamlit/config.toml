@@ -2,8 +2,12 @@
 # Streamlit >= 1.46 supports separate [theme.light] / [theme.dark] sections.
 # Users can switch them from the app menu (⋮ > Settings), and the app also has
 # its own "Appearance" switch (Auto / Light / Dark) in the sidebar.
-
 [theme]
+base = "light"
+primaryColor = "#F5B83D"
+backgroundColor = "#F6F1E4"
+secondaryBackgroundColor = "#FFFDF7"
+textColor = "#161D31"
 font = "sans serif"
 
 [theme.light]
