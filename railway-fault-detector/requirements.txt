@@ -1,8 +1,8 @@
-streamlit>=1.46
-tensorflow-cpu==2.20.0
+streamlit>=1.45
+tensorflow-cpu>=2.16,<2.19
 numpy
 pandas
 pillow
 matplotlib
 openpyxl
-reportlab
+fpdf2>=2.7
