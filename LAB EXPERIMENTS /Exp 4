@@ -24,3 +24,19 @@ cmap="gray"
 plt.axis("off")
 plt.title("Equalized Image")
 plt.show()
+plt.figure(figsize=(10,4))
+plt.subplot(1,2,1)
+plt.hist( 
+gray_image.ravel(), 
+256, 
+[0,256] 
+) 
+plt.title("Original Histogram") 
+plt.subplot(1,2,2) 
+plt.hist( 
+equalized_image.ravel(),
+256, 
+[0,256] 
+) 
+plt.title("Equalized Histogram")
+plt.show()
