@@ -13,6 +13,7 @@ Located in the [`railway-fault-detector`](railway-fault-detector/) directory, th
 - **Defect Detection:** Identifies critical structural defects such as rail surface cracks, misalignments, damaged sleepers, missing fasteners/Pandrol clips, and obstacles on the track.
 - **Real-Time Visual Alerts:** Overlays bounding boxes with defect labels and detection confidence scores directly on frame streams.
 - **Web Interface:** Built on Flask (`app.py`), allowing operators to upload video feeds, monitor real-time detections, and review logs via a web browser.
+APP LINK :- https://railway-track-inspector-simats.streamlit.app/
 
 ---
 
